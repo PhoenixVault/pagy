@@ -12,9 +12,13 @@ class Pagy
 
   module Helpers
     # This works with all Rack-based frameworks (Sinatra, Padrino, Rails, ...)
-    def pagy_url_for(page, pagy, url=false)
+    def pagy_url_for(page, pagy, url=false, custom_path=nil)
       p_vars = pagy.vars; params = request.GET.merge(p_vars[:params]); params[p_vars[:page_param].to_s] = page
-      "#{request.base_url if url}#{request.path}?#{Rack::Utils.build_nested_query(pagy_get_params(params))}#{p_vars[:anchor]}"
+      if custom_path.nil?
+        "#{request.base_url if url}#{request.path}?#{Rack::Utils.build_nested_query(pagy_get_params(params))}#{p_vars[:anchor]}"
+      else
+        "#{custom_path}?#{Rack::Utils.build_nested_query(pagy_get_params(params))}#{p_vars[:anchor]}"
+      end
     end
 
     # Sub-method called only by #pagy_url_for: here for easy customization of params by overriding
@@ -57,9 +61,9 @@ class Pagy
 
     # Returns a performance optimized proc to generate the HTML links
     # Benchmarked on a 20 link nav: it is ~22x faster and uses ~18x less memory than rails' link_to
-    def pagy_link_proc(pagy, link_extra='')
+    def pagy_link_proc(pagy, link_extra='', custom_path=nil)
       p_prev, p_next = pagy.prev, pagy.next
-      a, b = %(<a href="#{pagy_url_for(MARK, pagy)}" #{pagy.vars[:link_extra]} #{link_extra}).split(MARK, 2)
+      a, b = %(<a href="#{pagy_url_for(MARK, pagy, false, custom_path)}" #{pagy.vars[:link_extra]} #{link_extra}).split(MARK, 2)
       lambda {|n, text=n, extra=''| "#{a}#{n}#{b}#{ if    n == p_prev ; ' rel="prev"'
                                                     elsif n == p_next ; ' rel="next"'
                                                     else                           '' end } #{extra}>#{text}</a>"}
