@@ -8,8 +8,8 @@ class Pagy
   module Frontend
 
     # Pagination for bootstrap: it returns the html with the series of links to the pages
-    def pagy_bootstrap_nav(pagy)
-      link, p_prev, p_next = pagy_link_proc(pagy, 'class="page-link"'), pagy.prev, pagy.next
+    def pagy_bootstrap_nav(pagy, custom_path=nil)
+      link, p_prev, p_next = pagy_link_proc(pagy, 'class="page-link"', custom_path), pagy.prev, pagy.next
 
       html = EMPTY + (p_prev ? %(<li class="page-item prev">#{link.call p_prev, pagy_t('pagy.nav.prev'), 'aria-label="previous"'}</li>)
                              : %(<li class="page-item prev disabled"><a href="#" class="page-link">#{pagy_t('pagy.nav.prev')}</a></li>))
@@ -25,8 +25,8 @@ class Pagy
     end
 
     # Javascript pagination for bootstrap: it returns a nav and a JSON tag used by the Pagy.nav javascript
-    def pagy_bootstrap_nav_js(pagy, id=pagy_id)
-      link, p_prev, p_next = pagy_link_proc(pagy, 'class="page-link"'), pagy.prev, pagy.next
+    def pagy_bootstrap_nav_js(pagy, id=pagy_id, custom_path=nil)
+      link, p_prev, p_next = pagy_link_proc(pagy, 'class="page-link"', custom_path), pagy.prev, pagy.next
       tags = { 'before' => p_prev ? %(<ul class="pagination"><li class="page-item prev">#{link.call p_prev, pagy_t('pagy.nav.prev'), 'aria-label="previous"'}</li>)
                                   : %(<ul class="pagination"><li class="page-item prev disabled"><a href="#" class="page-link">#{pagy_t('pagy.nav.prev')}</a></li>),
                'link'   => %(<li class="page-item">#{mark = link.call(MARK)}</li>),
@@ -38,8 +38,8 @@ class Pagy
     end
 
     # Javascript combo pagination for bootstrap: it returns a nav and a JSON tag used by the Pagy.combo_nav javascript
-    def pagy_bootstrap_combo_nav_js(pagy, id=pagy_id)
-      link, p_prev, p_next, p_page, p_pages = pagy_link_proc(pagy), pagy.prev, pagy.next, pagy.page, pagy.pages
+    def pagy_bootstrap_combo_nav_js(pagy, id=pagy_id, custom_path=nil)
+      link, p_prev, p_next, p_page, p_pages = pagy_link_proc(pagy, nil, custom_path), pagy.prev, pagy.next, pagy.page, pagy.pages
 
       html = %(<nav id="#{id}" class="pagy-bootstrap-combo-nav-js pagination" role="navigation" aria-label="pager">) + %(<div class="btn-group" role="group">)
       html << (p_prev ? link.call(p_prev, pagy_t('pagy.nav.prev'), 'aria-label="previous" class="prev btn btn-primary"')
